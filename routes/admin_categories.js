@@ -17,68 +17,54 @@ router.get('/', function (req, res) {
 });
 
 /*
- * GET add page
+ * GET add category
  */
-router.get('/add-page', function (req, res) {
+router.get('/add-category', function (req, res) {
 
     var title = "";
-    var slug = "";
-    var content = "";
 
-    res.render('admin/add_page', {
-        title: title,
-        slug: slug,
-        content: content
+    res.render('admin/add_category', {
+        title: title
     });
 
 });
 
 /*
- * POST add page
+ * POST add category
  */
-router.post('/add-page', function (req, res) {
+router.post('/add-category', function (req, res) {
 
     req.checkBody('title', 'Title must have a value.').notEmpty();
-    req.checkBody('content', 'Content must have a value.').notEmpty();
 
     var title = req.body.title;
-    var slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
-    if (slug == "")
-        slug = title.replace(/\s+/g, '-').toLowerCase();
-    var content = req.body.content;
+    var slug = title.replace(/\s+/g, '-').toLowerCase();
 
     var errors = req.validationErrors();
 
     if (errors) {
-        res.render('admin/add_page', {
+        res.render('admin/add_category', {
             errors: errors,
-            title: title,
-            slug: slug,
-            content: content
+            title: title
         });
     } else {
-        Page.findOne({slug: slug}, function (err, page) {
-            if (page) {
-                req.flash('danger', 'Page slug exists, choose another.');
-                res.render('admin/add_page', {
-                    title: title,
-                    slug: slug,
-                    content: content
+        Category.findOne({slug: slug}, function (err, category) {
+            if (category) {
+                req.flash('danger', 'Category title exists, choose another.');
+                res.render('admin/add_category', {
+                    title: title
                 });
             } else {
-                var page = new Page({
+                var category = new Category({
                     title: title,
-                    slug: slug,
-                    content: content,
-                    sorting: 100
+                    slug: slug
                 });
 
-                page.save(function (err) {
+                category.save(function (err) {
                     if (err)
                         return console.log(err);
 
-                    req.flash('success', 'Page added!');
-                    res.redirect('/admin/pages');
+                    req.flash('success', 'Category added!');
+                    res.redirect('/admin/categories');
                 });
             }
         });
