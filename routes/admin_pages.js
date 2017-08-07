@@ -179,9 +179,9 @@ router.post('/edit-page/:slug', function (req, res) {
                             return console.log(err);
 
                         req.flash('success', 'Page added!');
-                        res.redirect('/admin/pages/edit-page/'+page.slug);
+                        res.redirect('/admin/pages/edit-page/' + page.slug);
                     });
-                
+
                 });
 
 
@@ -190,6 +190,20 @@ router.post('/edit-page/:slug', function (req, res) {
     }
 
 });
+
+/*
+ * GET delete page
+ */
+router.get('/delete-page/:id', function (req, res) {
+    Page.findByIdAndRemove(req.params.id, function (err) {
+        if (err)
+            return console.log(err);
+
+        req.flash('success', 'Page deleted!');
+        res.redirect('/admin/pages/');
+    });
+});
+
 
 // Exports
 module.exports = router;
