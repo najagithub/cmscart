@@ -7,13 +7,23 @@ var resizeImg = require('resize-img');
 // Get Product model
 var Product = require('../models/product');
 
+// Get Category model
+var Category = require('../models/category');
+
 /*
- * GET pages index
+ * GET products index
  */
 router.get('/', function (req, res) {
-    Page.find({}).sort({sorting: 1}).exec(function (err, pages) {
-        res.render('admin/pages', {
-            pages: pages
+    var count;
+
+    Product.count(function (err, c) {
+        count = c;
+    });
+
+    Product.find(function (err, products) {
+        res.render('admin/products', {
+            products: products,
+            count: count
         });
     });
 });
@@ -118,7 +128,7 @@ router.post('/reorder-pages', function (req, res) {
  */
 router.get('/edit-page/:id', function (req, res) {
 
-    Page.findById( req.params.id, function (err, page) {
+    Page.findById(req.params.id, function (err, page) {
         if (err)
             return console.log(err);
 
