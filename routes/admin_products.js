@@ -171,9 +171,10 @@ router.get('/edit-product/:id', function (req, res) {
                             desc: p.desc,
                             categories: categories,
                             category: p.category.replace(/\s+/g, '-').toLowerCase(),
-                            price: p.price,
+                            price: parseFloat(p.price).toFixed(2),
                             image: p.image,
-                            galleryImages: galleryImages
+                            galleryImages: galleryImages,
+                            id: p._id
                         });
                     }
                 });
