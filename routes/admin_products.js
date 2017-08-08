@@ -139,45 +139,47 @@ router.post('/add-product', function (req, res) {
 });
 
 /*
- * POST reorder pages
+ * GET edit product
  */
-router.post('/reorder-pages', function (req, res) {
-    var ids = req.body['id[]'];
+router.get('/edit-product/:id', function (req, res) {
 
-    var count = 0;
+    var errors;
 
-    for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
-        count++;
+    if (req.session.errors)
+        errors = req.session.errors;
+    req.session.errors = null;
 
-        (function (count) {
-            Page.findById(id, function (err, page) {
-                page.sorting = count;
-                page.save(function (err) {
-                    if (err)
-                        return console.log(err);
+    Category.find(function (err, categories) {
+
+        Product.findById(req.params.id, function (err, p) {
+            if (err) {
+                console.log(err);
+                res.redirect('/admin/products');
+            } else {
+                var galleryDir = 'public/product_images/' + p._id + '/gallery';
+                var galleryImages = null;
+
+                fs.readdir(galleryDir, function (err, files) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        galleryImages = files;
+
+                        res.render('admin/edit_product', {
+                            title: p.title,
+                            errors: errors,
+                            desc: p.desc,
+                            categories: categories,
+                            category: p.category.replace(/\s+/g, '-').toLowerCase(),
+                            price: p.price,
+                            image: p.image,
+                            galleryImages: galleryImages
+                        });
+                    }
                 });
-            });
-        })(count);
-
-    }
-});
-
-/*
- * GET edit page
- */
-router.get('/edit-page/:id', function (req, res) {
-
-    Page.findById(req.params.id, function (err, page) {
-        if (err)
-            return console.log(err);
-
-        res.render('admin/edit_page', {
-            title: page.title,
-            slug: page.slug,
-            content: page.content,
-            id: page._id
+            }
         });
+
     });
 
 });
