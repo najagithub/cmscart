@@ -82,7 +82,7 @@ router.post('/add-product', function (req, res) {
     } else {
         Product.findOne({slug: slug}, function (err, product) {
             if (product) {
-                req.flash('danger', 'Product ttile exists, choose another.');
+                req.flash('danger', 'Product title exists, choose another.');
                 Category.find(function (err, categories) {
                     res.render('admin/add_product', {
                         title: title,
@@ -186,61 +186,78 @@ router.get('/edit-product/:id', function (req, res) {
 });
 
 /*
- * POST edit page
+ * POST edit product
  */
-router.post('/edit-page/:id', function (req, res) {
+router.post('/edit-product/:id', function (req, res) {
+
+    var imageFile = typeof req.files.image !== "undefined" ? req.files.image.name : "";
 
     req.checkBody('title', 'Title must have a value.').notEmpty();
-    req.checkBody('content', 'Content must have a value.').notEmpty();
+    req.checkBody('desc', 'Description must have a value.').notEmpty();
+    req.checkBody('price', 'Price must have a value.').isDecimal();
+    req.checkBody('image', 'You must upload an image').isImage(imageFile);
 
     var title = req.body.title;
-    var slug = req.body.slug.replace(/\s+/g, '-').toLowerCase();
-    if (slug == "")
-        slug = title.replace(/\s+/g, '-').toLowerCase();
-    var content = req.body.content;
+    var slug = title.replace(/\s+/g, '-').toLowerCase();
+    var desc = req.body.desc;
+    var price = req.body.price;
+    var category = req.body.category;
+    var pimage = req.body.pimage;
     var id = req.params.id;
 
     var errors = req.validationErrors();
 
     if (errors) {
-        res.render('admin/edit_page', {
-            errors: errors,
-            title: title,
-            slug: slug,
-            content: content,
-            id: id
-        });
+        req.session.errors = errors;
+        res.redirect('/admin/products/edit-product/' + id);
     } else {
-        Page.findOne({slug: slug, _id: {'$ne': id}}, function (err, page) {
-            if (page) {
-                req.flash('danger', 'Page slug exists, choose another.');
-                res.render('admin/edit_page', {
-                    title: title,
-                    slug: slug,
-                    content: content,
-                    id: id
-                });
+        Product.findOne({slug: slug, _id: {'$ne': id}}, function (err, p) {
+            if (err)
+                console.log(err);
+
+            if (p) {
+                req.flash('danger', 'Product title exists, choose another.');
+                res.redirect('/admin/products/edit-product/' + id);
             } else {
-
-                Page.findById(id, function (err, page) {
+                Product.findById(id, function (err, p) {
                     if (err)
-                        return console.log(err);
+                        console.log(err);
 
-                    page.title = title;
-                    page.slug = slug;
-                    page.content = content;
+                    p.title = title;
+                    p.slug = slug;
+                    p.desc = desc;
+                    p.price = parseFloat(price).toFixed(2);
+                    p.category = category;
+                    if (imageFile != "") {
+                        p.image = imageFile;
+                    }
 
-                    page.save(function (err) {
+                    p.save(function (err) {
                         if (err)
-                            return console.log(err);
+                            console.log(err);
 
-                        req.flash('success', 'Page added!');
-                        res.redirect('/admin/pages/edit-page/' + id);
+                        if (imageFile != "") {
+                            if (pimage != "") {
+                                fs.remove('public/product_images/' + id + '/' + pimage, function (err) {
+                                    if (err)
+                                        console.log(err);
+                                });
+                            }
+
+                            var productImage = req.files.image;
+                            var path = 'public/product_images/' + id + '/' + imageFile;
+
+                            productImage.mv(path, function (err) {
+                                return console.log(err);
+                            });
+                            
+                        }
+                        
+                        req.flash('success', 'Product edited!');
+                        res.redirect('/admin/products/edit-product/' + id);
                     });
 
                 });
-
-
             }
         });
     }
