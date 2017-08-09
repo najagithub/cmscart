@@ -70,7 +70,12 @@
 </ul>
 
 <br><br>
-<form action="/admin/products/product-gallery/<%= id %>" method="post" enctype="multipart/form-data" class="dropzone" id="dropzoneForm"></form>
+<form action="/admin/products/product-gallery/<%= id %>" method="post" enctype="multipart/form-data" class="dropzone" id="dropzoneForm">
+    <div class="fallback">
+        <input type="file" name="file" multiple>
+        <input type="submit" value="Upload">
+    </div>
+</form>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/basic.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/dropzone.css"/>

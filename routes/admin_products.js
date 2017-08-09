@@ -250,9 +250,9 @@ router.post('/edit-product/:id', function (req, res) {
                             productImage.mv(path, function (err) {
                                 return console.log(err);
                             });
-                            
+
                         }
-                        
+
                         req.flash('success', 'Product edited!');
                         res.redirect('/admin/products/edit-product/' + id);
                     });
@@ -261,6 +261,29 @@ router.post('/edit-product/:id', function (req, res) {
             }
         });
     }
+
+});
+
+/*
+ * POST product gallery
+ */
+router.post('/product-gallery/:id', function (req, res) {
+
+    var productImage = req.files.file;
+    var id = req.params.id;
+    var path = 'public/product_images/' + id + '/gallery/' + req.files.file.name;
+    var thumbsPath = 'public/product_images/' + id + '/gallery/thumbs/' + req.files.file.name;
+
+    productImage.mv(path, function (err) {
+        if (err)
+            console.log(err);
+
+        resizeImg(fs.readFileSync(path), {width: 100, height: 100}).then(function (buf) {
+            fs.writeFileSync(thumbsPath, buf);
+        });
+    });
+
+    res.sendStatus(200);
 
 });
 
