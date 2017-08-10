@@ -8,8 +8,9 @@ var Category = require('../models/category');
  * GET category index
  */
 router.get('/', function (req, res) {
-    Category.find(function(err, categories) {
-        if (err) return console.log(err);
+    Category.find(function (err, categories) {
+        if (err)
+            return console.log(err);
         res.render('admin/categories', {
             categories: categories
         });
@@ -62,6 +63,14 @@ router.post('/add-category', function (req, res) {
                 category.save(function (err) {
                     if (err)
                         return console.log(err);
+
+                    Category.find(function (err, categories) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            req.app.locals.categories = categories;
+                        }
+                    });
 
                     req.flash('success', 'Category added!');
                     res.redirect('/admin/categories');
@@ -128,6 +137,14 @@ router.post('/edit-category/:id', function (req, res) {
                         if (err)
                             return console.log(err);
 
+                        Category.find(function (err, categories) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                req.app.locals.categories = categories;
+                            }
+                        });
+
                         req.flash('success', 'Category edited!');
                         res.redirect('/admin/categories/edit-category/' + id);
                     });
@@ -148,6 +165,14 @@ router.get('/delete-category/:id', function (req, res) {
     Category.findByIdAndRemove(req.params.id, function (err) {
         if (err)
             return console.log(err);
+
+        Category.find(function (err, categories) {
+            if (err) {
+                console.log(err);
+            } else {
+                req.app.locals.categories = categories;
+            }
+        });
 
         req.flash('success', 'Category deleted!');
         res.redirect('/admin/categories/');
