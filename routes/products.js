@@ -4,11 +4,14 @@ var router = express.Router();
 // Get Product model
 var Product = require('../models/product');
 
+// Get Category model
+var Category = require('../models/category');
+
 /*
  * GET all products
  */
 router.get('/', function (req, res) {
-    
+
     Product.find(function (err, products) {
         if (err)
             console.log(err);
@@ -18,31 +21,31 @@ router.get('/', function (req, res) {
             products: products
         });
     });
-    
+
 });
 
+
 /*
- * GET a page
+ * GET products by category
  */
-router.get('/:slug', function (req, res) {
+router.get('/:category', function (req, res) {
 
-    var slug = req.params.slug;
+    var categorySlug = req.params.category;
 
-    Page.findOne({slug: slug}, function (err, page) {
-        if (err)
-            console.log(err);
-        
-        if (!page) {
-            res.redirect('/');
-        } else {
-            res.render('index', {
-                title: page.title,
-                content: page.content
+    Category.findOne({slug: categorySlug}, function (err, c) {
+        Product.find({category: categorySlug}, function (err, products) {
+            if (err)
+                console.log(err);
+
+            res.render('cat_products', {
+                title: c.title,
+                products: products
             });
-        }
+        });
     });
 
-    
+
+
 });
 
 // Exports
