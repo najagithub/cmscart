@@ -11,3 +11,13 @@ a.pa {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+img.spi {
+    width: 100%;
+}
+
+ul.gallery li {
+    display: inline-block;
+    margin: 20px;
+    list-style: none;
+}
