@@ -123,7 +123,7 @@ function sortPages(ids, callback) {
 /*
  * POST reorder pages
  */
-router.post('/reorder-pages', isAdmin, function (req, res) {
+router.post('/reorder-pages', function (req, res) {
     var ids = req.body['id[]'];
 
     sortPages(ids, function () {
